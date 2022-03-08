@@ -1,4 +1,4 @@
-#!/home/stef/tasks/sdr/env/bin/python
+#!/usr/bin/env python3
 ##################################################
 # Gnuradio Python Flow Graph
 # Title: Top Block
@@ -13,6 +13,7 @@ from gnuradio import filter
 from gnuradio import gr
 from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
+from gnuradio.fft import fft_python
 from optparse import OptionParser
 import math
 import osmosdr
@@ -49,7 +50,7 @@ class top_block(gr.top_block):
         self.osmosdr_source_c_0_1.set_antenna("", 0)
         self.osmosdr_source_c_0_1.set_bandwidth(0, 0)
           
-        self.freq_xlating_fir_filter_xxx_0_1 = filter.freq_xlating_fir_filter_ccc(1, (firdes.low_pass(1, samp_rate,cutoff, width,  firdes.WIN_BLACKMAN, 6.76)), -freq_offset, samp_rate)
+        self.freq_xlating_fir_filter_xxx_0_1 = filter.freq_xlating_fir_filter_ccc(1, (firdes.low_pass(1, samp_rate,cutoff, width, fft_python.window.win_type.WIN_BLACKMAN, 6.76)), -freq_offset, samp_rate)
         self.digital_binary_slicer_fb_0 = digital.binary_slicer_fb()
         self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, "capture", False)
         self.blocks_file_sink_0.set_unbuffered(False)
@@ -127,7 +128,7 @@ if __name__ == '__main__':
     parser = OptionParser(option_class=eng_option, usage="%prog: [options]")
     (options, args) = parser.parse_args()
     if gr.enable_realtime_scheduling() != gr.RT_OK:
-        print "Error: failed to enable realtime scheduling."
+        print("Error: failed to enable realtime scheduling.")
     tb = top_block()
     tb.start()
     tb.wait()
