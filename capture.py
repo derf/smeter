@@ -43,7 +43,7 @@ class top_block(gr.top_block):
         self.osmosdr_source_c_0_1.set_center_freq(tuner+freq_offset, 0)
         self.osmosdr_source_c_0_1.set_freq_corr(21, 0)
         self.osmosdr_source_c_0_1.set_iq_balance_mode(0, 0)
-        self.osmosdr_source_c_0_1.set_gain_mode(0, 0)
+        self.osmosdr_source_c_0_1.set_gain_mode(True, 0)
         self.osmosdr_source_c_0_1.set_gain(10, 0)
         self.osmosdr_source_c_0_1.set_if_gain(24, 0)
         self.osmosdr_source_c_0_1.set_bb_gain(20, 0)
