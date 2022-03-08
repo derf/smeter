@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys, math, binascii, struct
 from bitarray import bitarray
@@ -96,7 +96,7 @@ def parse(bits):
         if pos < 50 or pos > 140:
             #"no sync byte found %s" % pos
             return
-        print "T2 zomg!!!!"
+        print("T2 zomg!!!!")
         #sync_size=len(T2_OTHER_SYNC)
         return
     else:
@@ -118,7 +118,6 @@ def parse(bits):
     return decoded, binascii.hexlify(decoded[4:10])
 
 def todate(d):
-    d=[ord(c) for c in d]
     return '%02d-%02d-%04d' % (
         ((d[1] & 1) << 4) | (d[0] >> 4),
         ((d[1]>>1) & 0xf),
@@ -127,7 +126,7 @@ def todate(d):
 def dump(decoded):
     manuf = []
     vendor = struct.unpack("<H", decoded[2:4])[0]
-    for i in xrange(3):
+    for i in range(3):
         manuf.append(chr(0x40 + (vendor & 0x1f)))
         vendor >>= 5
     manuf = ''.join(reversed(manuf))
@@ -135,15 +134,15 @@ def dump(decoded):
     #print CVALS[ord(decoded[1])],
     #print manuf,
 
-    print "%02x%02x" % (ord(decoded[5]),ord(decoded[4])),
-    print "%02x%02x" % (ord(decoded[6]),ord(decoded[7])),
-    print "%-10s" % todate(decoded[18:20]),
-    print "%-3s" % ord(decoded[26]),
-    print "%-3s" % ord(decoded[27]),
-    print "%-5s" % struct.unpack('<H',decoded[20:22])[0],
-    print "%-5s" % struct.unpack('<H',decoded[22:24])[0],
-    print "%-5s" % struct.unpack('<H',decoded[24:26])[0],
-    print "%-5s" % (struct.unpack('<H',decoded[22:24])[0] - struct.unpack('<H',decoded[24:26])[0]),
+    print("%02x%02x" % (decoded[5],decoded[4]),)
+    print("%02x%02x" % (decoded[6],decoded[7]),)
+    print("%-10s" % todate(decoded[18:20]),)
+    print("%-3s" % decoded[26],)
+    print("%-3s" % decoded[27],)
+    print("%-5s" % struct.unpack('<H',decoded[20:22])[0],)
+    print("%-5s" % struct.unpack('<H',decoded[22:24])[0],)
+    print("%-5s" % struct.unpack('<H',decoded[24:26])[0],)
+    print("%-5s" % (struct.unpack('<H',decoded[22:24])[0] - struct.unpack('<H',decoded[24:26])[0]),)
     #print "%-5s" % struct.unpack('<H',decoded[26:28])[0],
     #print '+',
     #print "%-5s" % struct.unpack('<H',decoded[30:32])[0],
@@ -155,27 +154,28 @@ def dump(decoded):
     #print "%-5s" % struct.unpack('<H',decoded[52:54])[0],
     #print "%-5s" % struct.unpack('<H',decoded[54:56])[0],
     #print "+",
-    print '\t', ' | '.join((hexdump(t[12:28]), hexdump(t[30:46]), hexdump(t[48:-2])))
+    print('\t', ' | '.join((hexdump(t[12:28]), hexdump(t[30:46]), hexdump(t[48:-2]))))
     nl=False
     if decoded[0] != '\x32':
-        print >>sys.stderr, '[x] size', binascii.hexlify(decoded[0])
+        print('[x] size', bytes.decode(binascii.hexlify(decoded[0])), file=sys.stderr)
         nl=True
     if decoded[1] != '\x44':
-        print >>sys.stderr, '[x] type', binascii.hexlify(decoded[1]), CVALS.get(ord(decoded[1]),'UNKNOWN'),
+        print('[x] type', bytes.decode(binascii.hexlify(decoded[1])), CVALS.get(ord(decoded[1]),'UNKNOWN'), file=sys.stderr)
         nl=True
     if decoded[2:4] != '\x68\x50':
-        print >>sys.stderr, '[x] make', manuf
+        print('[x] make', manuf, file=sys.stderr)
         nl=True
     if decoded[6:8] not in ['\x16\x03','\x17\x03', '\x86\x02', '\x87\x02']:
-        print >>sys.stderr, '[x] at', binascii.hexlify(decoded[6:8]),
+        print('[x] at', binascii.hexlify(decoded[6:8]), file=sysst.derr)
         nl=True
     if decoded[8:10] != '\x69\x80':
-        print >>sys.stderr, '[x] a', binascii.hexlify(decoded[8:10]),
+        print('[x] a', binascii.hexlify(decoded[8:10]), file=sysst.derr)
         nl=True
     if decoded[12:16] not in ['\xa0\x11\x9f\x1d', '\xa0\x91\x9f\x1d']:
-        print >>sys.stderr, '[x] 1/1', binascii.hexlify(decoded[12:16]),
+        print('[x] 1/1', binascii.hexlify(decoded[12:16]), file=sysst.derr)
         nl=True
-    if nl: print >>sys.stderr
+    if nl:
+        print(file=sys.stderr)
 
 def split_by_n( seq, n ):
     """A generator to divide a sequence into chunks of n units.
@@ -185,7 +185,7 @@ def split_by_n( seq, n ):
         seq = seq[n:]
 
 def hexdump(a):
-    return ' '.join(split_by_n(binascii.hexlify(a),4))
+    return ' '.join(map(bytes.decode, split_by_n(binascii.hexlify(a),4)))
 
 def bindump(a):
     a = format(int(binascii.hexlify(a)[2:],16),"0%db" % (len(a)*8))
@@ -195,13 +195,13 @@ def display(decoded):
     #date='/'.join((str(x) for x in (ord(decoded[18]) & 0x1F,
     #                               (ord(decoded[19]) & 0x0F) - 1,
     #                               ((ord(decoded[18]) & 0xE0) >> 5) | ((ord(decoded[17]) & 0xF0) >> 1))))
-    return ' '.join(("%02x%02x" % (ord(decoded[5]),ord(decoded[4])),
+    return ' '.join(("%02x%02x" % (decoded[5],decoded[4]),
                      "%04x" % struct.unpack('<H',decoded[6:8])[0],
                      #"%5s" % struct.unpack('<H',decoded[18:20])[0],
                      "%-10s" % todate(decoded[18:20]),
                      #"%5s" % struct.unpack('<H',decoded[16:18])[0], no clue what this is
-                     "%5s" % ord(decoded[26]),
-                     "%5s" % ord(decoded[27]),
+                     "%5s" % decoded[26],
+                     "%5s" % decoded[27],
                      "%5s" % struct.unpack('<H',decoded[20:22])[0],
                      #"%5s" % struct.unpack('<H',decoded[26:28])[0],
                      "%5s" % struct.unpack('<H',decoded[22:24])[0],
@@ -228,26 +228,26 @@ if __name__ == '__main__':
     for p,a  in pkts:
         pcnt[p]+=1
         amap[a].append(p)
-    print 'total meters:', len(amap.keys()), 'total messages:', len(pcnt.keys()), 'total pkts:', len(pkts), 'dropped', len(bad)
+    print('total meters:', len(amap.keys()), 'total messages:', len(pcnt.keys()), 'total pkts:', len(pkts), 'dropped', len(bad))
 
-    print 'latest'
-    print "%4s %4s %10s %5s %5s %5s %5s %5s %6s %6s %5s" % ("id", "foo", "time", "cur", "last", "total", "in", "out", "diff", "avg", "seen")
+    print('latest')
+    print("%4s %4s %10s %5s %5s %5s %5s %5s %6s %6s %5s" % ("id", "foo", "time", "cur", "last", "total", "in", "out", "diff", "avg", "seen"))
     for k, a, b in sorted([(a, display(amap[a][-1]), "%5s" % len(amap[a])) for a in amap.keys()]):
         avg = "%6s" % (sum((struct.unpack('<H',decoded[24:26])[0] - struct.unpack('<H',decoded[22:24])[0]) for decoded in amap[k]) / len(amap[k]))
-        print a, avg, b, '\t', ' | '.join((hexdump(amap[k][-1][30:46]), hexdump(amap[k][-1][48:-2])))
-    print
+        print(a, avg, b, '\t', ' | '.join((hexdump(amap[k][-1][30:46]), hexdump(amap[k][-1][48:-2]))))
+    print()
 
-    print "details"
+    print("details")
     for a in sorted(amap.keys()):
         for t in amap[a]:
             if t not in pcnt: continue
-            print "%-3s" % pcnt[t],
+            print("%-3s" % pcnt[t],)
             dump(t)
             #print >>sys.stderr, hexdump(t)
             del pcnt[t]
-        print
+        print()
 
-    print 'dropped'
+    print('dropped')
     for b in bad:
         if not b: continue
-        print b
+        print(b)

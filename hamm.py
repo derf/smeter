@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-from itertools import izip_longest
+from itertools import zip_longest
 #from bitarray import bitarray
 #def hamming(a, b):
 #    return (a ^ b).count()
@@ -9,7 +9,7 @@ from itertools import izip_longest
 
 def hamming(a,b):
     dist=0
-    for b1,b2 in izip_longest(a,b,fillvalue=None):
+    for b1,b2 in zip_longest(a,b,fillvalue=None):
         if b1!=b2: dist+=1
     return dist
 
@@ -26,7 +26,7 @@ def diff(a,b):
         else:
             vbits[i] = 1
             sys.stdout.write("\x1b[31m%s\x1b[0m" % c)
-    print
+    print()
 
 def split_by_n( seq, n ):
     """A generator to divide a sequence into chunks of n units.
@@ -41,8 +41,8 @@ def tobin(h):
 if __name__ == '__main__':
     pkts=[tobin(sys.stdin.readline().strip())]
     vbits=[0] * len(pkts[0])
-    print ''.join(["%-8s" % i for i in xrange(len(vbits)/8)])
-    print pkts[-1]
+    print(''.join(["%-8s" % i for i in xrange(len(vbits)/8)]))
+    print(pkts[-1])
     while True:
         cur = sys.stdin.readline().strip()
         if not cur: break
@@ -55,7 +55,7 @@ if __name__ == '__main__':
             sys.stdout.write("\x1b[31m%s\x1b[0m" % 1)
         else:
             sys.stdout.write(' ')
-    print
+    print()
 
     for i, byte in enumerate(split_by_n(vbits,8)):
         if sum(byte) == 0:
@@ -63,14 +63,14 @@ if __name__ == '__main__':
             sys.stdout.write("%8s" % ("%03d %02x" % (n, n)))
         else:
             sys.stdout.write(' '*8)
-    print
+    print()
 
     for dist, a, b in sorted(descartes(pkts, hamming)):
-        print dist, pkts.index(a), pkts.index(b)
-        print ''.join(["%-8s" % i for i in xrange(len(vbits)/8)])
-        print a
+        print(dist, pkts.index(a), pkts.index(b))
+        print(''.join(["%-8s" % i for i in xrange(len(vbits)/8)]))
+        print(a)
         diff(b,a)
         for i, byte in enumerate(split_by_n(a,8)):
             n = int(byte,2)
             sys.stdout.write("%8s" % ("%03d %02x" % (n, n)))
-        print
+        print()
